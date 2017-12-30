@@ -1,7 +1,7 @@
 package com.greenmist.vector.lib.model
 
+import android.graphics.Matrix
 import android.graphics.Path
-import android.os.Build
 import com.greenmist.vector.lib.svg.util.TextScanner
 import com.greenmist.vector.logger.SvgLogger
 
@@ -15,10 +15,124 @@ import com.greenmist.vector.logger.SvgLogger
  */
 class VPath : Path() {
 
-    fun arcToCompat() {
+    fun arcTo(lastX: Float, lastY: Float, rx: Float, ry: Float, angle: Float, largeArcFlag: Boolean, sweepFlag: Boolean, x: Float, y: Float) {
+        if (lastX == x && lastY == y) {
+            return
+        }
 
+        if (rx == 0f || ry == 0f) {
+            lineTo(x, y)
+            return
+        }
+
+        var rx = Math.abs(rx)
+        var ry = Math.abs(ry)
+
+        val angleRad = Math.toRadians(angle % 360.0).toFloat()
+        val cosAngle = Math.cos(angleRad.toDouble()).toFloat()
+        val sinAngle = Math.sin(angleRad.toDouble()).toFloat()
+
+        val dx2 = (lastX - x) / 2.0f
+        val dy2 = (lastY - y) / 2.0f
+
+        val x1 = (cosAngle * dx2 + sinAngle * dy2)
+        val y1 = (-sinAngle * dx2 + cosAngle * dy2)
+
+        var rxSquared = rx * rx
+        var rySquared = ry * ry
+        val x1Squared = x1 * x1
+        val y1Squared = y1 * y1
+
+        val radiiCheck = x1Squared / rxSquared + y1Squared / rySquared
+        if (radiiCheck > 1) {
+            rx *= Math.sqrt(radiiCheck.toDouble()).toFloat()
+            ry *= Math.sqrt(radiiCheck.toDouble()).toFloat()
+            rxSquared = rx * rx
+            rySquared = ry * ry
+        }
+
+        var sign = if (largeArcFlag == sweepFlag) -1f else 1f
+        var sq = ((rxSquared * rySquared) - (rxSquared * y1Squared) - (rySquared * x1Squared)) / ((rxSquared * y1Squared) + (rySquared * x1Squared))
+        sq = if (sq < 0) 0f else sq
+        val coef = sign * Math.sqrt(sq.toDouble())
+        val cx1 = coef * ((rx * y1) / ry)
+        val cy1 = coef * -((ry * x1) / rx)
+
+        val sx2 = (lastX + x) / 2.0f
+        val sy2 = (lastY + y) / 2.0f
+        val cx = (sx2 + (cosAngle * cx1 - sinAngle * cy1)).toFloat()
+        val cy = (sy2 + (sinAngle * cx1 + cosAngle * cy1)).toFloat()
+
+        val ux = (x1 - cx1) / rx
+        val uy = (y1 - cy1) / ry
+        val vx = (-x1 - cx1) / rx
+        val vy = (-y1 - cy1) / ry
+
+        var n = Math.sqrt((ux * ux) + (uy * uy))
+        var p = ux
+        sign = if (uy < 0) -1f else 1f
+        var angleStart = Math.toDegrees(sign * Math.acos(p / n))
+
+        n = Math.sqrt((ux * ux + uy * uy) * (vx * vx + vy * vy))
+        p = ux * vx + uy * vy
+        sign = if (ux * vy - uy * vx < 0) -1f else 1f
+        var angleExtent = Math.toDegrees(sign * Math.acos(p / n))
+        if (sweepFlag == false && angleExtent > 0) {
+            angleExtent -= 360f
+        } else if (sweepFlag && angleExtent < 0) {
+            angleExtent += 360f
+        }
+        angleExtent %= 360f
+        angleStart %= 360f
+
+        val segments = Math.ceil(Math.abs(angleExtent) / 90.0).toInt()
+
+        angleStart = Math.toRadians(angleStart)
+        angleExtent = Math.toRadians(angleExtent)
+        val angleIncr = (angleExtent / segments).toFloat()
+
+        val controlLen = (4.0 / 3.0 * Math.sin(angleIncr / 2.0) / (1.0 + Math.cos(angleIncr / 2.0))).toFloat()
+
+        val cubicPoints = FloatArray(segments * 6)
+        var pos = 0
+
+        var curAngle: Float
+        var dx: Float
+        var dy: Float
+
+        for (i in 0 until segments) {
+            curAngle = (angleStart + i * angleIncr).toFloat()
+
+            dx = Math.cos(curAngle.toDouble()).toFloat()
+            dy = Math.sin(curAngle.toDouble()).toFloat()
+
+            cubicPoints[pos++] = dx - controlLen * dy
+            cubicPoints[pos++] = dy + controlLen * dx
+
+            curAngle += angleIncr
+            dx = Math.cos(curAngle.toDouble()).toFloat()
+            dy = Math.sin(curAngle.toDouble()).toFloat()
+            cubicPoints[pos++] = dx + controlLen * dy
+            cubicPoints[pos++] = dy - controlLen * dx
+
+            cubicPoints[pos++] = dx
+            cubicPoints[pos++] = dy
+        }
+
+        val m = Matrix()
+        m.postScale(rx, ry)
+        m.postRotate(angle)
+        m.postTranslate(cx, cy)
+        m.mapPoints(cubicPoints)
+
+        cubicPoints[cubicPoints.size - 2] = x
+        cubicPoints[cubicPoints.size - 1] = y
+
+        for (i in 0 until cubicPoints.size step 6) {
+            cubicTo(cubicPoints[i], cubicPoints[i + 1], cubicPoints[i + 2], cubicPoints[i + 3], cubicPoints[i + 4], cubicPoints[i + 5])
+        }
     }
-
+    
     companion object {
         val supportedCommands = arrayListOf<Char>()
 
@@ -56,6 +170,8 @@ fun CharSequence.toVPath() : VPath {
     var isRelative: Boolean
     var isFirstCommand = true
     var skipNextCommand = false
+    var largeArcFlag: Boolean
+    var sweepFlag: Boolean
 
     var x: Float
     var y: Float
@@ -272,6 +388,8 @@ fun CharSequence.toVPath() : VPath {
                     rx = scanner.nextFloat()
                     ry = scanner.nextFloat()
                     xAxisRotation = scanner.nextFloat()
+                    largeArcFlag = scanner.nextFloat() != 0f
+                    sweepFlag = scanner.nextFloat() != 0f
                     x = scanner.nextFloat()
                     y = scanner.nextFloat()
 
@@ -280,12 +398,12 @@ fun CharSequence.toVPath() : VPath {
                         break@pathParse
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        path.arcTo(rx, ry, x, y, xAxisRotation, 0f, true)
-                    } else {
-
+                    if (isRelative) {
+                        x += currentX
+                        y += currentY
                     }
-                    SvgLogger.d("Shorthand Quad Bezier at $currentX, $currentY to $x, $y with control $lastControlX, $lastControlY $relativeStr")
+
+                    path.arcTo(currentX, currentY, rx, ry, xAxisRotation, largeArcFlag, sweepFlag, x, y)
 
                     currentX = x
                     currentY = y
