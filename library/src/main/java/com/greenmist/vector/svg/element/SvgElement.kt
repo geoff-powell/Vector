@@ -12,10 +12,10 @@ open class SvgElement(attributes: Attributes? = null) {
     val properties = Properties(attributes)
     var id: String? = properties["id"]
 
-    var style: Style = Style(properties = properties)
-
     var parent: SvgElement? = null
     var children: MutableList<SvgElement> = ArrayList()
+
+    var style: Style = Style(properties, parent?.style)
 
     fun addChild(element: SvgElement) {
         children.add(element)

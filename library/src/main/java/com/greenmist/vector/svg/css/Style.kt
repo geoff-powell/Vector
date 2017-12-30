@@ -25,6 +25,8 @@ class Style {
 
     internal var color: String? = null
 
+    internal var parentStyle: Style? = null
+
     // parent/inherited values
 //    var fillColor: ColorSVG? = null
 //    var fillOpacity: Float? = null
@@ -47,8 +49,14 @@ class Style {
 //
 //    var filter: Filter? = null
 
-    constructor(inlineStyle: String = "", properties: Properties) {
+    constructor() {
+
+    }
+
+    constructor(properties: Properties, parentStyle: Style? = null) {
         //TODO parse inlineStyle string
+
+        this.parentStyle = parentStyle
 
         fill = properties["fill"]
         stroke = properties["stroke"]
