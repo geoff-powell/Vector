@@ -9,3 +9,5 @@ inline fun String.isNotBlank(block: (String) -> Unit) = when {
     this.isNotBlank() -> block(this)
     else -> {}
 }
+
+fun Float.clamp(min: Float, max: Float): Float = Math.max(min, Math.min(this, max))

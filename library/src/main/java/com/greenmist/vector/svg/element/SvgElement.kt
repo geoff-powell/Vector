@@ -15,7 +15,7 @@ open class SvgElement(attributes: Attributes? = null) {
     var parent: SvgElement? = null
     var children: MutableList<SvgElement> = ArrayList()
 
-    var style: Style = Style(properties, parent?.style)
+    var style: Style = Style(properties)
 
     fun addChild(element: SvgElement) {
         children.add(element)

@@ -19,15 +19,15 @@ class CssColor(color: Int = 0, withAlpha: Boolean = true) {
     constructor(r: Int, g: Int, b: Int) : this(Color.rgb(r, g, b))
     constructor(r: Int, g: Int, b: Int, a: Int) : this(Color.argb(a, r, g, b))
     constructor(hexColor: String) : this(Color.parseColor(hexColor))
+
+    companion object {
+        val BLACK: CssColor = CssColor()
+        var CURRENT_COLOR: CssColor = CssColor()
+    }
 }
 
-fun String.toCssColor(): CssColor? {
-    if (this == "none") return null
-
-    ColorKeywords[this]?.let {
-        return CssColor(it)
-    }
-
+fun String.toCssColor(): CssColor {
+    ColorKeywords[this]?.let { return CssColor(it) }
     return CssColor(this)
 }
 

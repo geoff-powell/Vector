@@ -1,22 +1,42 @@
 package com.greenmist.vector.lib.svg.css
 
+import android.graphics.Paint
+import com.greenmist.vector.extensions.clamp
+import com.greenmist.vector.lib.model.CssColor
 import com.greenmist.vector.lib.model.CssLength
 import com.greenmist.vector.lib.model.toCssLength
 import com.greenmist.vector.lib.svg.Properties
+import com.greenmist.vector.svg.css.CssFillRule
+import com.greenmist.vector.svg.css.CssPaint
+import com.greenmist.vector.svg.css.toCssFillRule
+import com.greenmist.vector.svg.css.toCssPaint
 
 /**
  * Created by geoff.powell on 11/27/17.
  */
-class Style {
+class Style() : Cloneable {
 
-    internal var fill: String? = null
+    constructor(properties: Properties) : this() {
+        fill = properties["fill"]?.toCssPaint()
+        fillRule = properties["fill-rule"]?.toCssFillRule()
+        fillOpacity = properties["fill-opacity"]?.toFloat()?.clamp(0f, 1f)
+        stroke = properties["stroke"]?.toCssPaint()
+        strokeOpacity = properties["stroke-opacity"]?.toFloat()?.clamp(0f, 1f)
+        strokeWidth = properties["stroke-width"]?.toCssLength()
+        strokeLineCap = properties["stroke-linecap"]?.toCap()
+        strokeLineJoin = properties["stroke-linejoin"]?.toJoin()
+        opacity = properties["opacity"]?.toFloat()?.clamp(0f, 1f)
+    }
+
+    internal var fill: CssPaint? = null
+    internal var fillRule: CssFillRule? = null
     internal var fillOpacity: Float? = null
 
-    internal var stroke: String? = null
+    internal var stroke: CssPaint? = null
     internal var strokeOpacity: Float? = null
     internal var strokeWidth: CssLength? = null
-    internal var strokeLineCap: String? = null
-    internal var strokeLineJoin: String? = null
+    internal var strokeLineCap: Paint.Cap? = null
+    internal var strokeLineJoin: Paint.Join? = null
     internal var strokeMiterLimit: Float? = null
     internal var strokeDashArray: Array<CssLength>? = null
     internal var strokeDashOffset: CssLength? = null
@@ -25,21 +45,8 @@ class Style {
 
     internal var color: String? = null
 
-    internal var parentStyle: Style? = null
-
     // parent/inherited values
-//    var fillColor: ColorSVG? = null
-//    var fillOpacity: Float? = null
 //    var gr: Gradient? = null
-//
-//    var strokeColor: ColorSVG? = null
-//    var strokeCapStyle: Paint.Cap? = null
-//    var strokeJoinStyle: Paint.Join? = null
-//    var strokeWidth: Float? = null
-//    var strokeOpacity: Float? = null
-//    var dasharray: Numbers? = null
-//    var dashOffset: Float? = null
-//    var opacity: Float? = null
 //
 //    var fontName: String? = null
 //    var fontSize: Float? = null
@@ -49,17 +56,41 @@ class Style {
 //
 //    var filter: Filter? = null
 
-    constructor() {
-
+    fun updateStyle(style: Style) {
+        this.fill = style.fill ?: this.fill
+        this.fillRule = style.fillRule ?: this.fillRule
+        this.fillOpacity = style.fillOpacity ?: this.fillOpacity
+        this.stroke = style.stroke ?: this.stroke
+        this.strokeOpacity = style.strokeOpacity ?: this.strokeOpacity
+        this.strokeWidth = style.strokeWidth ?: this.strokeWidth
+        this.strokeLineCap = style.strokeLineCap ?: this.strokeLineCap
+        this.strokeLineJoin = style.strokeLineJoin ?: this.strokeLineJoin
+        this.strokeMiterLimit = style.strokeMiterLimit ?: this.strokeMiterLimit
+        this.strokeDashArray = style.strokeDashArray ?: this.strokeDashArray
+        this.strokeDashOffset = style.strokeDashOffset ?: this.strokeDashOffset
+        this.opacity = style.opacity ?: this.opacity
+        this.color = style.color ?: this.color
     }
 
-    constructor(properties: Properties, parentStyle: Style? = null) {
-        //TODO parse inlineStyle string
+    override public fun clone(): Any {
+        return super.clone()
+    }
 
-        this.parentStyle = parentStyle
+    companion object {
+        val BASE : Style by lazy {
+            val style = Style()
+            style.fill = CssPaint(CssColor.BLACK)
+            style.fillRule = CssFillRule.NONZERO
+            style.fillOpacity = 1f
+            style.strokeWidth = CssLength(1f)
+            style.strokeOpacity = 1f
+            style.strokeLineCap = Paint.Cap.BUTT
+            style.strokeLineJoin = Paint.Join.MITER
 
-        fill = properties["fill"]
-        stroke = properties["stroke"]
-        strokeWidth = properties["stroke-width"]?.toCssLength()
+            return@lazy style
+        }
     }
 }
+
+fun String.toCap() : Paint.Cap = Paint.Cap.valueOf(this.toUpperCase())
+fun String.toJoin() : Paint.Join = Paint.Join.valueOf(this.toUpperCase())
