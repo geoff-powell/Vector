@@ -6,10 +6,7 @@ import com.greenmist.vector.lib.model.CssColor
 import com.greenmist.vector.lib.model.CssLength
 import com.greenmist.vector.lib.model.toCssLength
 import com.greenmist.vector.lib.svg.Properties
-import com.greenmist.vector.svg.css.CssFillRule
-import com.greenmist.vector.svg.css.CssPaint
-import com.greenmist.vector.svg.css.toCssFillRule
-import com.greenmist.vector.svg.css.toCssPaint
+import com.greenmist.vector.svg.css.*
 
 /**
  * Created by geoff.powell on 11/27/17.
@@ -20,12 +17,17 @@ class Style() : Cloneable {
         fill = properties["fill"]?.toCssPaint()
         fillRule = properties["fill-rule"]?.toCssFillRule()
         fillOpacity = properties["fill-opacity"]?.toFloat()?.clamp(0f, 1f)
+
         stroke = properties["stroke"]?.toCssPaint()
         strokeOpacity = properties["stroke-opacity"]?.toFloat()?.clamp(0f, 1f)
         strokeWidth = properties["stroke-width"]?.toCssLength()
         strokeLineCap = properties["stroke-linecap"]?.toCap()
         strokeLineJoin = properties["stroke-linejoin"]?.toJoin()
+
         opacity = properties["opacity"]?.toFloat()?.clamp(0f, 1f)
+
+        display = properties["display"]?.toCssDisplay()
+        visibility = properties["visibility"]?.toCssVisibility()
     }
 
     internal var fill: CssPaint? = null
@@ -42,8 +44,10 @@ class Style() : Cloneable {
     internal var strokeDashOffset: CssLength? = null
 
     internal var opacity: Float? = null // master opacity of both stroke and fill
-
     internal var color: String? = null
+
+    internal var visibility: CssVisibility? = null
+    internal var display: CssDisplay? = null
 
     // parent/inherited values
 //    var gr: Gradient? = null
@@ -60,6 +64,7 @@ class Style() : Cloneable {
         this.fill = style.fill ?: this.fill
         this.fillRule = style.fillRule ?: this.fillRule
         this.fillOpacity = style.fillOpacity ?: this.fillOpacity
+
         this.stroke = style.stroke ?: this.stroke
         this.strokeOpacity = style.strokeOpacity ?: this.strokeOpacity
         this.strokeWidth = style.strokeWidth ?: this.strokeWidth
@@ -68,8 +73,11 @@ class Style() : Cloneable {
         this.strokeMiterLimit = style.strokeMiterLimit ?: this.strokeMiterLimit
         this.strokeDashArray = style.strokeDashArray ?: this.strokeDashArray
         this.strokeDashOffset = style.strokeDashOffset ?: this.strokeDashOffset
+
         this.opacity = style.opacity ?: this.opacity
         this.color = style.color ?: this.color
+
+        this.visibility = style.visibility ?: this.visibility
     }
 
     override public fun clone(): Any {
@@ -86,6 +94,11 @@ class Style() : Cloneable {
             style.strokeOpacity = 1f
             style.strokeLineCap = Paint.Cap.BUTT
             style.strokeLineJoin = Paint.Join.MITER
+
+            style.opacity = 1f
+
+            style.visibility = CssVisibility.VISIBLE
+            style.display = CssDisplay.INLINE
 
             return@lazy style
         }

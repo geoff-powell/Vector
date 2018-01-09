@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/vector"
+        android:title="@string/vector_title"
+        />
+
+    <item
+        android:id="@+id/simple_shapes"
+        android:title="@string/simple_shapes_title"
+        />
+
+    <item
+        android:id="@+id/path"
+        android:title="@string/path_title"
+        />
+
+    <item
+        android:id="@+id/fill"
+        android:title="@string/fill_title"
+        />
+
+    <item
+        android:id="@+id/advanced"
+        android:title="@string/advanced_title"
+        />
+
+</menu>

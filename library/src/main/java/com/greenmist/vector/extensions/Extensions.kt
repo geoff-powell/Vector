@@ -5,9 +5,9 @@ package com.greenmist.vector.extensions
  */
 fun CharSequence?.isNotNullOrBlank(): Boolean = this != null && this.isNotBlank()
 
-inline fun String.isNotBlank(block: (String) -> Unit) = when {
+internal inline fun String.isNotBlank(block: (String) -> Unit) = when {
     this.isNotBlank() -> block(this)
     else -> {}
 }
 
-fun Float.clamp(min: Float, max: Float): Float = Math.max(min, Math.min(this, max))
+internal fun Float.clamp(min: Float, max: Float): Float = Math.max(min, Math.min(this, max))

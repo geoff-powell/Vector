@@ -20,17 +20,19 @@ object Renderer {
         renderState.updateStyle(element.style)
         renderState.apply()
 
-        if (element is SvgRenderableElement) {
-            if (renderState.hasFill()) {
-                element.render(canvas, renderState.fillPaint, renderState)
+        if (renderState.shouldDisplay()) {
+            if (element is SvgRenderableElement) {
+                if (renderState.hasFill()) {
+                    element.render(canvas, renderState.fillPaint, renderState)
+                }
+                if (renderState.hasStroke()) {
+                    element.render(canvas, renderState.strokePaint, renderState)
+                }
             }
-            if (renderState.hasStroke()) {
-                element.render(canvas, renderState.strokePaint, renderState)
-            }
-        }
 
-        element.children.forEach {
-            drawElement(it, canvas)
+            element.children.forEach {
+                drawElement(it, canvas)
+            }
         }
 
         renderState = stateStack.pop()

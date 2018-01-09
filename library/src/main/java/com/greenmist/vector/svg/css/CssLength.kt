@@ -1,5 +1,8 @@
 package com.greenmist.vector.lib.model
 
+import com.greenmist.vector.lib.model.CssLength.Companion.fromString
+import com.greenmist.vector.svg.exception.SvgParseException
+
 /**
  * Created by geoffpowell on 11/19/17.
  */
@@ -31,16 +34,24 @@ class CssLength(internal val value: Float = 0f, internal val unit: Unit = Unit.P
             else -> calculatePxValue(fontSize, xHeight)
         }
     }
+
+    companion object {
+        fun fromString(string: String) : CssLength {
+            val unit = Unit.getUnit(string)
+
+            val value = if (string.length > unit.identifier.length) {
+                string.substring(0, string.length - unit.identifier.length).toFloatOrNull()
+            } else {
+                string.toFloatOrNull()
+            }
+
+            value ?: throw SvgParseException("Could not parse $string to CssLength")
+
+            return CssLength(value, unit)
+        }
+    }
 }
 
 fun String.toCssLength(): CssLength {
-    val unit = Unit.getUnit(this)
-
-    val value = if (this.length > unit.identifier.length) {
-        this.substring(0, this.length - unit.identifier.length).toFloat()
-    } else {
-        this.toFloat()
-    }
-
-    return CssLength(value, unit)
+    return CssLength.fromString(this)
 }

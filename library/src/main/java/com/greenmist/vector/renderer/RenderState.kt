@@ -2,7 +2,9 @@ package com.greenmist.vector.renderer
 
 import android.graphics.Paint
 import com.greenmist.vector.lib.svg.css.Style
+import com.greenmist.vector.svg.css.CssDisplay
 import com.greenmist.vector.svg.css.CssPaint
+import com.greenmist.vector.svg.css.CssVisibility
 
 class RenderState(val style: Style = Style.BASE) {
 
@@ -19,9 +21,11 @@ class RenderState(val style: Style = Style.BASE) {
     var textPaint = Paint()
         private set
 
-    fun hasFill() = style.fill != null && style.fill != CssPaint.NONE
+    fun hasFill() = style.fill != null && style.fill != CssPaint.NONE && style.visibility == CssVisibility.VISIBLE
 
-    fun hasStroke() = style.stroke != null && style.stroke != CssPaint.NONE
+    fun hasStroke() = style.stroke != null && style.stroke != CssPaint.NONE && style.visibility == CssVisibility.VISIBLE
+
+    fun shouldDisplay() = style.display == null || style.display != CssDisplay.NONE
 
     init {
         fillPaint.style = Paint.Style.FILL
