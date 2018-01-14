@@ -7,6 +7,11 @@
         />
 
     <item
+        android:id="@+id/transforms"
+        android:title="@string/transforms_title"
+        />
+
+    <item
         android:id="@+id/simple_shapes"
         android:title="@string/simple_shapes_title"
         />

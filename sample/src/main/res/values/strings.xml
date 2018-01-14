@@ -5,4 +5,5 @@
     <string name="fill_title">Fill</string>
     <string name="simple_shapes_title">Simple Shapes</string>
     <string name="advanced_title">Advanced</string>
+    <string name="transforms_title">Transforms</string>
 </resources>

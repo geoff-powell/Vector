@@ -22,19 +22,21 @@ class TextScanner(input: CharSequence)  {
         if (position < length) ++position
     }
 
-    fun skipWhitespace() {
+    fun skip(skipFunc: (Char) -> Boolean) {
         while (hasNext()) {
-            if (current.isWhitespace() == false) break
+            if (skipFunc(current) == false) break
             next()
         }
     }
 
-    fun skipNumberSeparator() {
-        while (hasNext()) {
-            if (current != ',' && current.isWhitespace() == false) break
-            next()
-        }
+    fun skipWhitespace() {
+        skip { it.isWhitespace() }
     }
+
+    fun skipNumberSeparator() {
+        skip { it == ',' || it.isWhitespace() }
+    }
+
     private fun parseNumber() : Float? {
         var num: Float? = null
         while (hasNext()) {
@@ -45,6 +47,18 @@ class TextScanner(input: CharSequence)  {
         }
         
         return num
+    }
+
+    private fun parseString() : String? {
+        var string: String? = null
+        while (hasNext()) {
+            if (current.isLetter() == false) break
+            string = string ?: ""
+            string += current
+            next()
+        }
+
+        return string
     }
 
     /**
@@ -118,6 +132,13 @@ class TextScanner(input: CharSequence)  {
         val f = parseFloat()
         skipNumberSeparator()
         return f
+    }
+
+    fun nextString() : String? {
+        skipWhitespace()
+        val s = parseString()
+        skipNumberSeparator()
+        return s
     }
 
     fun possibleNextFloat() : Float? {

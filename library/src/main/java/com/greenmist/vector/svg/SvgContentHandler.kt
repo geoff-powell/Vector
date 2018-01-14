@@ -10,6 +10,7 @@ import org.xml.sax.helpers.DefaultHandler
 class SvgContentHandler(val parser: SvgDocumentParser) : DefaultHandler() {
 
     internal lateinit var svg: Svg
+    private val innerBuffer = StringBuilder()
 
     override fun startDocument() {
         SvgLogger.d("Start Document")
@@ -24,11 +25,20 @@ class SvgContentHandler(val parser: SvgDocumentParser) : DefaultHandler() {
         val name = localName ?: qName ?: return
 
         parser.pushElement(uri, name, attributes)
+        innerBuffer.setLength(0)
+    }
+
+    override fun characters(array: CharArray?, start: Int, length: Int) {
+        array?.let {
+            for (i in start until length) {
+                innerBuffer.append(it[i])
+            }
+        }
     }
 
     override fun endElement(uri: String?, localName: String?, qName: String?) {
         val name: String = localName ?: qName ?: return
 
-        parser.popElement()
+        parser.popElement(uri, name, innerBuffer.toString().trim())
     }
 }

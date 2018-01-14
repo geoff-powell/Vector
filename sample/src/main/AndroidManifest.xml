@@ -22,6 +22,8 @@
 
         <activity android:name=".screens.SimpleShapesActivity"/>
 
+        <activity android:name=".screens.TransformsActivity"/>
+
         <activity android:name=".screens.PathActivity"/>
 
         <activity android:name=".screens.FillActivity"/>

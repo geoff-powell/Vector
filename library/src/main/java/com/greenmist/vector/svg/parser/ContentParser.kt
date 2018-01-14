@@ -10,5 +10,7 @@ interface ContentParser {
 
     val namespace: String
 
-    fun parse(localName: String?, attributes: Attributes?) : SvgElement?
+    fun parseTag(localName: String?, attributes: Attributes?) : SvgElement?
+
+    fun parseInnerContent(element: SvgElement?, localName: String?, innerContent: String)
 }

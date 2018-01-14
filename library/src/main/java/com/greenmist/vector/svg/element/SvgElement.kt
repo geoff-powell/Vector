@@ -1,7 +1,9 @@
 package com.greenmist.vector.lib.svg.element
 
+import com.greenmist.vector.lib.model.toViewBox
 import com.greenmist.vector.lib.svg.Properties
 import com.greenmist.vector.lib.svg.css.Style
+import com.greenmist.vector.svg.model.toTransform
 import org.xml.sax.Attributes
 
 /**
@@ -14,6 +16,8 @@ open class SvgElement(attributes: Attributes? = null) {
 
     var parent: SvgElement? = null
     var children: MutableList<SvgElement> = ArrayList()
+
+    var transform = properties["transform"]?.toTransform()
 
     var style: Style = Style(properties)
 

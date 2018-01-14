@@ -23,6 +23,7 @@ object Vector {
         private var inputStream: InputStream? = null
 
         private var keepUnsupportedTags: Boolean = false
+        private var dpi: Int = context.resources.displayMetrics.densityDpi
         // TODO Add functionality to pass custom content parsers
         private var customContentParsers: List<ContentParser> = listOf(SvgTagParser())
 
@@ -46,6 +47,10 @@ object Vector {
             return this
         }
 
+        fun withDpi(dpi: Int) {
+            this.dpi = dpi
+        }
+
         fun keepUsupportedTags(keepUnsupportedTags: Boolean) : SvgBuilder {
             this.keepUnsupportedTags = keepUnsupportedTags
             return this
@@ -58,7 +63,7 @@ object Vector {
             val saxParser = saxParserFactory.newSAXParser()
             val xmlReader = saxParser.xmlReader
 
-            val svgDocumentParser = SvgDocumentParser(keepUnsupportedTags, customContentParsers)
+            val svgDocumentParser = SvgDocumentParser(keepUnsupportedTags, dpi, customContentParsers)
             val svgContentHandler = SvgContentHandler(svgDocumentParser)
 
             xmlReader.contentHandler = svgContentHandler

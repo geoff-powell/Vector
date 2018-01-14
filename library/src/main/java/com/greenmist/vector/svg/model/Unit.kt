@@ -25,10 +25,10 @@ enum class Unit(val pxScaleFactor: Float = 1f, var identifier: String = "") {
         val PX_DEFAULT_FONT_SIZE = 16f
         val PX_DEFAULT_X_HEIGHT = 0.5f
 
-        fun getUnit(identifier: String) : Unit {
+        fun fromString(identifier: String) : Unit? {
             return values().firstOrNull {
-                it.identifier.endsWith(identifier)
-            } ?: PX
+                identifier.endsWith(it.identifier, true)
+            }
         }
     }
 }

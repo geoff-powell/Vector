@@ -36,6 +36,9 @@ abstract class BaseActivity : AppCompatActivity() {
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     startActivity(intent)
                 }
+                R.id.transforms -> {
+                    startActivity(Intent(this, TransformsActivity::class.java))
+                }
                 R.id.simple_shapes -> {
                     startActivity(Intent(this, SimpleShapesActivity::class.java))
                 }

@@ -12,13 +12,14 @@ class SvgTagParser : ContentParser {
 
     override val namespace: String = "http://www.w3.org/2000/svg"
 
-    override fun parse(localName: String?, attributes: Attributes?): SvgElement? {
+    override fun parseTag(localName: String?, attributes: Attributes?): SvgElement? {
         val tag = SvgTagKeywords.fromString(localName)
 
         return when(tag) {
             SvgTagKeywords.SVG -> RootSvgElement(attributes)
             SvgTagKeywords.CIRCLE -> SvgCircleElement(attributes)
             SvgTagKeywords.RECT -> SvgRectElement(attributes)
+            SvgTagKeywords.LINE -> SvgLineElement(attributes)
             SvgTagKeywords.PATH -> SvgPathElement(attributes)
             SvgTagKeywords.TEXT -> SvgTextElement(attributes)
             SvgTagKeywords.TSPAN -> SvgTextSpanElement(attributes)
@@ -27,6 +28,12 @@ class SvgTagParser : ContentParser {
                 SvgLogger.d("Support for $localName element has not been implemented")
                 return null
             }
+        }
+    }
+
+    override fun parseInnerContent(element: SvgElement?, localName: String?, innerContent: String) {
+        if (element is SvgTextElement) {
+            element.text = innerContent
         }
     }
 }
