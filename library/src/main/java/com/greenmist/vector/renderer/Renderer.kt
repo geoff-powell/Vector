@@ -19,9 +19,7 @@ object Renderer {
     fun drawElement(element: SvgElement, canvas: Canvas) {
         stateStack.push(renderState)
         renderState = RenderState(renderState)
-        renderState.apply(element)
-
-        canvas.matrix = renderState.matrix
+        renderState.apply(element, canvas)
 
         if (renderState.shouldDisplay()) {
             if (element is SvgRenderableElement) {

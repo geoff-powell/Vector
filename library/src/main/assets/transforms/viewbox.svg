@@ -20,5 +20,4 @@
     <text x="100" y="600" font-size="200" font-family="Verdana" >
         Stretch to fit
     </text>
-    <circle cx="100" cy="600" r="100" fill="purple" />
 </svg>

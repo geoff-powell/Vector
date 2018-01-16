@@ -3,6 +3,7 @@ package com.greenmist.vector.lib.svg.parser
 import com.greenmist.vector.lib.keyword.SvgTagKeywords
 import com.greenmist.vector.lib.svg.element.*
 import com.greenmist.vector.logger.SvgLogger
+import com.greenmist.vector.svg.element.SvgDescriptionElement
 import org.xml.sax.Attributes
 
 /**
@@ -17,6 +18,7 @@ class SvgTagParser : ContentParser {
 
         return when(tag) {
             SvgTagKeywords.SVG -> RootSvgElement(attributes)
+//            SvgTagKeywords.DESC -> SvgDescriptionElement(attributes)
             SvgTagKeywords.CIRCLE -> SvgCircleElement(attributes)
             SvgTagKeywords.RECT -> SvgRectElement(attributes)
             SvgTagKeywords.LINE -> SvgLineElement(attributes)
@@ -31,10 +33,8 @@ class SvgTagParser : ContentParser {
         }
     }
 
-    override fun parseInnerContent(element: SvgElement?, localName: String?, innerContent: String) {
-        if (element is SvgTextElement) {
-            element.text = innerContent
-        }
+    override fun parseContent(element: SvgElement?, localName: String?, content: String) {
+        element?.parseContent(content)
     }
 }
 

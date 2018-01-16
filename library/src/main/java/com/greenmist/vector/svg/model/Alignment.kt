@@ -14,8 +14,8 @@ class Alignment(
 
             when {
                 string.length >= 8 -> {
-                    xAlignment = string.substring(0, 3).toAlignmentType() ?: AlignmentType.NONE
-                    yAlignment = string.substring(4, 7).toAlignmentType() ?: AlignmentType.NONE
+                    xAlignment = string.substring(0, 4).toAlignmentType() ?: AlignmentType.NONE
+                    yAlignment = string.substring(4, 8).toAlignmentType() ?: AlignmentType.NONE
                 }
                 string.equals("none", true) -> {
                     xAlignment = AlignmentType.NONE

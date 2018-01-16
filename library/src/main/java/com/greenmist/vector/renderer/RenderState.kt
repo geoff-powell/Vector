@@ -1,5 +1,6 @@
 package com.greenmist.vector.renderer
 
+import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -24,7 +25,6 @@ class RenderState(
     constructor(copy: RenderState): this(copy.style.clone() as Style, Matrix(copy.matrix), Length(copy.width), Length(copy.height), copy.dpi) {
         fillPaint = Paint(copy.fillPaint)
         strokePaint = Paint(copy.strokePaint)
-        textPaint = Paint(copy.textPaint)
         viewBox = ViewBox(copy.viewBox)
         viewPort = ViewBox(copy.viewPort)
     }
@@ -33,13 +33,11 @@ class RenderState(
         private set
     var strokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
         private set
-    var textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        private set
     var dpi: Int = dpi
         private set
     var viewBox: ViewBox = ViewBox()
 
-    var viewPort: ViewBox = ViewBox(0f, 0f, width.getPxValueX(this), height.getPxValueY(this))
+    private var viewPort: ViewBox = ViewBox(0f, 0f, width.getPxValueX(this), height.getPxValueY(this))
 
     fun hasFill() = style.fill != null && style.fill != CssPaint.NONE && style.visibility == CssVisibility.VISIBLE
 
@@ -50,10 +48,9 @@ class RenderState(
     init {
         fillPaint.style = Paint.Style.FILL
         strokePaint.style = Paint.Style.STROKE
-        textPaint.style = Paint.Style.FILL_AND_STROKE
     }
 
-    fun apply(element: SvgElement) {
+    fun apply(element: SvgElement, canvas: Canvas) {
         style.updateStyle(element.style)
 
         if (element is ViewportElement) {
@@ -66,10 +63,17 @@ class RenderState(
             matrix.preConcat(it.getMatrix())
         }
 
-        textPaint.textSize = style.fontSize?.getPxValueY(this) ?: Unit.PX_DEFAULT_FONT_SIZE
+        style.fontName?.let {
+            // TODO Load typeface into cache from assets/downloadable fonts etc
+            fillPaint.typeface = Typeface.create(it, Typeface.NORMAL)
+            strokePaint.typeface = Typeface.create(it, Typeface.NORMAL)
+        }
+
+        val fontSize = style.fontSize?.getPxValueY(this) ?: Unit.PX_DEFAULT_FONT_SIZE
+        fillPaint.textSize = fontSize
+        strokePaint.textSize = fontSize
 
         style.fill?.cssColor?.color?.let {
-            textPaint.color = it
             fillPaint.color = it
         }
 
@@ -77,5 +81,7 @@ class RenderState(
         style.strokeWidth?.getPxValue(this)?.let { strokePaint.strokeWidth = it }
         style.strokeLineCap?.let { strokePaint.strokeCap = it }
         style.strokeLineJoin?.let { strokePaint.strokeJoin = it }
+
+        canvas.matrix = matrix
     }
 }

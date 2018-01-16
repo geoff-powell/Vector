@@ -42,7 +42,7 @@ class SvgDocumentParser(private val keepUnsupportedTags: Boolean, private val dp
             ignoreElementDepth--
         } else {
             val contentParser = contentParsers.firstOrNull { it.namespace == namespace }
-            contentParser?.parseInnerContent(currentElement, localName, innerText)
+            contentParser?.parseContent(currentElement, localName, innerText)
 
             currentElement?.let {
                 currentElement = it.parent

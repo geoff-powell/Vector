@@ -1,5 +1,7 @@
 package com.greenmist.vector.lib.keyword
 
+import com.greenmist.vector.lib.model.CssColor.Companion.INT_COLOR_BLACK
+
 /**
  * Created by geoffpowell on 11/19/17.
  */
@@ -15,7 +17,7 @@ object ColorKeywords {
         colorMap.put("azure", -0xf0001)
         colorMap.put("beige", -0xa0a24)
         colorMap.put("bisque", -0x1b3c)
-        colorMap.put("black", -0x1000000)
+        colorMap.put("black", INT_COLOR_BLACK)
         colorMap.put("blanchedalmond", -0x1433)
         colorMap.put("blue", -0xffff01)
         colorMap.put("blueviolet", -0x75d41e)

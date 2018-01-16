@@ -12,5 +12,5 @@ interface ContentParser {
 
     fun parseTag(localName: String?, attributes: Attributes?) : SvgElement?
 
-    fun parseInnerContent(element: SvgElement?, localName: String?, innerContent: String)
+    fun parseContent(element: SvgElement?, localName: String?, innerContent: String)
 }

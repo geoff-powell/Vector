@@ -1,6 +1,5 @@
 package com.greenmist.vector.lib.svg.element
 
-import com.greenmist.vector.lib.model.toViewBox
 import com.greenmist.vector.lib.svg.Properties
 import com.greenmist.vector.lib.svg.css.Style
 import com.greenmist.vector.svg.model.toTransform
@@ -20,6 +19,10 @@ open class SvgElement(attributes: Attributes? = null) {
     var transform = properties["transform"]?.toTransform()
 
     var style: Style = Style(properties)
+
+    open fun parseContent(content: String) {
+
+    }
 
     fun addChild(element: SvgElement) {
         children.add(element)
