@@ -40,8 +40,7 @@ object Renderer {
     }
 
     fun render(canvas: Canvas, svg: Svg, dpi: Int) {
-        renderState = RenderState(dpi = dpi, width = svg.rootElement.width ?: Length(), height = svg.rootElement.height ?: Length())
-        renderState.viewBox = svg.rootElement.viewBox ?: ViewBox()
+        renderState = RenderState(dpi = dpi, viewport = svg.rootElement.viewport, viewBox = svg.rootElement.viewBox)
 
         stateStack.push(RenderState(renderState))
 

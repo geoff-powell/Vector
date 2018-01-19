@@ -1,6 +1,7 @@
 package com.greenmist.vector.lib.svg.element
 
 import android.graphics.*
+import com.greenmist.vector.lib.model.Length
 import com.greenmist.vector.lib.model.toLength
 import com.greenmist.vector.renderer.RenderState
 import org.xml.sax.Attributes
@@ -29,9 +30,9 @@ class SvgTextElement(
     }
 
     override fun render(canvas: Canvas, paint: Paint, renderState: RenderState) {
-        if (x != null && y != null && text.isNotBlank()) {
-            val xVal = x.getPxValueX(renderState)
-            val yVal = y.getPxValueY(renderState)
+        if (text.isNotBlank()) {
+            val xVal = x?.getPxValueX(renderState) ?: 0f
+            val yVal = y?.getPxValueY(renderState) ?: 0f
             canvas.drawText(text, xVal, yVal, paint)
         }
     }

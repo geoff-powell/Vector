@@ -4,9 +4,9 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Typeface
-import com.greenmist.vector.lib.model.Length
 import com.greenmist.vector.lib.model.Unit
 import com.greenmist.vector.lib.model.ViewBox
+import com.greenmist.vector.lib.model.Viewport
 import com.greenmist.vector.lib.svg.css.Style
 import com.greenmist.vector.lib.svg.element.SvgElement
 import com.greenmist.vector.svg.css.CssDisplay
@@ -17,33 +17,34 @@ import com.greenmist.vector.svg.element.ViewportElement
 class RenderState(
         val style: Style = Style.BASE,
         val matrix: Matrix = Matrix(),
-        val width: Length = Length(),
-        val height: Length = Length(),
-        dpi: Int = 0
+        var viewport: Viewport = Viewport(),
+        var viewBox: ViewBox? = null,
+        val fillPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG),
+        val strokePaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG),
+        val dpi: Int = 0
 ) {
 
-    constructor(copy: RenderState): this(copy.style.clone() as Style, Matrix(copy.matrix), Length(copy.width), Length(copy.height), copy.dpi) {
-        fillPaint = Paint(copy.fillPaint)
-        strokePaint = Paint(copy.strokePaint)
-        viewBox = ViewBox(copy.viewBox)
-        viewPort = ViewBox(copy.viewPort)
-    }
-
-    var fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        private set
-    var strokePaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        private set
-    var dpi: Int = dpi
-        private set
-    var viewBox: ViewBox = ViewBox()
-
-    private var viewPort: ViewBox = ViewBox(0f, 0f, width.getPxValueX(this), height.getPxValueY(this))
+    constructor(copy: RenderState): this(
+            copy.style.clone() as Style,
+            Matrix(copy.matrix),
+            copy.viewport.copy(),
+            if (copy.viewBox != null)
+                ViewBox(copy.viewBox!!)
+            else null,
+            Paint(copy.fillPaint),
+            Paint(copy.strokePaint),
+            copy.dpi)
 
     fun hasFill() = style.fill != null && style.fill != CssPaint.NONE && style.visibility == CssVisibility.VISIBLE
 
     fun hasStroke() = style.stroke != null && style.stroke != CssPaint.NONE && style.visibility == CssVisibility.VISIBLE
 
-    fun shouldDisplay() = style.display == null || style.display != CssDisplay.NONE || (viewBox.width > 0f && viewBox.height > 0f)
+    fun shouldDisplay(): Boolean {
+        val validViewbox = viewBox?.let {
+            it.width > 0f && it.height > 0f
+        } ?: false
+        return style.display == null || style.display != CssDisplay.NONE || validViewbox
+    }
 
     init {
         fillPaint.style = Paint.Style.FILL
@@ -53,14 +54,18 @@ class RenderState(
     fun apply(element: SvgElement, canvas: Canvas) {
         style.updateStyle(element.style)
 
-        if (element is ViewportElement) {
-            element.viewBox?.let {
-                matrix.preConcat(it.getMatrix(viewPort, it, element.preserveAspectRatio))
-            }
-        }
-
         element.transform?.let {
             matrix.preConcat(it.getMatrix())
+        }
+
+        if (element is ViewportElement) {
+            viewport = element.viewport
+            element.viewBox?.let {
+                viewBox = it
+            }
+            viewBox?.let {
+                matrix.preConcat(it.getMatrix(this, viewport, it, element.preserveAspectRatio))
+            }
         }
 
         style.fontName?.let {
@@ -83,5 +88,11 @@ class RenderState(
         style.strokeLineJoin?.let { strokePaint.strokeJoin = it }
 
         canvas.matrix = matrix
+        
+        if (element is ViewportElement) {
+            viewBox?.let {
+                canvas.clipRect(it.toRectF())
+            }
+        }
     }
 }

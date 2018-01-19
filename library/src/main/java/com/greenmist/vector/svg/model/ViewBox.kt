@@ -3,6 +3,7 @@ package com.greenmist.vector.lib.model
 import android.graphics.Matrix
 import android.graphics.RectF
 import com.greenmist.vector.lib.svg.util.TextScanner
+import com.greenmist.vector.renderer.RenderState
 import com.greenmist.vector.svg.exception.SvgParseException
 import com.greenmist.vector.svg.model.AlignmentType
 import com.greenmist.vector.svg.model.MeetOrSlice
@@ -48,19 +49,22 @@ class ViewBox() : Cloneable {
     }
 
     //TODO Remove comments
-    fun getMatrix(viewPort: ViewBox, viewBox: ViewBox, preserveAspectRatio: PreserveAspectRatio?): Matrix {
+    fun getMatrix(renderState: RenderState, viewPort: Viewport, viewBox: ViewBox, preserveAspectRatio: PreserveAspectRatio?): Matrix {
         val matrix = Matrix()
 
         val aspectRatio = preserveAspectRatio ?: PreserveAspectRatio()
 
-        val xScale = viewPort.width / viewBox.width
-        val yScale = viewPort.height / viewBox.height
+        val width = viewPort.width.getPxValueX(renderState)
+        val height = viewPort.height.getPxValueY(renderState)
+
+        val xScale = width / viewBox.width
+        val yScale = height / viewBox.height
         var xOffset = -viewBox.minX
         var yOffset = -viewBox.minY
 
         // 'none' means scale both dimensions to fit the viewport
         if (aspectRatio.alignment.xAlignment == AlignmentType.NONE && aspectRatio.alignment.yAlignment == AlignmentType.NONE) {
-            matrix.preTranslate(viewPort.minX, viewPort.minY)
+            matrix.preTranslate(viewPort.x, viewPort.y)
             matrix.preScale(xScale, yScale)
             matrix.preTranslate(xOffset, yOffset)
             return matrix
@@ -75,8 +79,8 @@ class ViewBox() : Cloneable {
         }
 
         // What size will the image end up being?
-        val imageW = viewPort.width / scale
-        val imageH = viewPort.height / scale
+        val imageW = width / scale
+        val imageH = height / scale
         // Determine final X position
         when (aspectRatio.alignment.xAlignment) {
             AlignmentType.XMID -> xOffset -= (viewBox.width - imageW) / 2
@@ -91,7 +95,7 @@ class ViewBox() : Cloneable {
             else -> {}
         }
 
-        matrix.preTranslate(viewPort.minX, viewPort.minY)
+        matrix.preTranslate(viewPort.x, viewPort.y)
         matrix.preScale(scale, scale)
         matrix.preTranslate(xOffset, yOffset)
         return matrix
