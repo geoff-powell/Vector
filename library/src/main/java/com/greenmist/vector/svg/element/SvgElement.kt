@@ -16,7 +16,7 @@ open class SvgElement(attributes: Attributes? = null) {
     var parent: SvgElement? = null
     var children: MutableList<SvgElement> = ArrayList()
 
-    var transform = properties["transform"]?.toTransform()
+    val classType: String? = properties["class"]
 
     var style: Style = Style(properties)
 

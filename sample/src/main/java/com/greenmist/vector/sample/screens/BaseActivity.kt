@@ -36,21 +36,12 @@ abstract class BaseActivity : AppCompatActivity() {
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     startActivity(intent)
                 }
-                R.id.transforms -> {
-                    startActivity(Intent(this, TransformsActivity::class.java))
-                }
-                R.id.simple_shapes -> {
-                    startActivity(Intent(this, SimpleShapesActivity::class.java))
-                }
-                R.id.path -> {
-                    startActivity(Intent(this, PathActivity::class.java))
-                }
-                R.id.fill -> {
-                    startActivity(Intent(this, FillActivity::class.java))
-                }
-                R.id.advanced -> {
-                    startActivity(Intent(this, AdvancedActivity::class.java))
-                }
+                R.id.transforms -> startActivity(Intent(this, TransformsActivity::class.java))
+                R.id.simple_shapes -> startActivity(Intent(this, SimpleShapesActivity::class.java))
+                R.id.path -> startActivity(Intent(this, PathActivity::class.java))
+                R.id.fill -> startActivity(Intent(this, FillActivity::class.java))
+                R.id.advanced -> startActivity(Intent(this, AdvancedActivity::class.java))
+                R.id.basic -> startActivity(Intent(this, BasicActivity::class.java))
             }
             drawer_layout.closeDrawers()
 

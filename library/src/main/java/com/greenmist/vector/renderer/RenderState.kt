@@ -1,9 +1,6 @@
 package com.greenmist.vector.renderer
 
-import android.graphics.Canvas
-import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.Typeface
+import android.graphics.*
 import com.greenmist.vector.lib.model.Unit
 import com.greenmist.vector.lib.model.ViewBox
 import com.greenmist.vector.lib.model.Viewport
@@ -12,6 +9,7 @@ import com.greenmist.vector.lib.svg.element.SvgElement
 import com.greenmist.vector.svg.css.CssDisplay
 import com.greenmist.vector.svg.css.CssPaint
 import com.greenmist.vector.svg.css.CssVisibility
+import com.greenmist.vector.svg.element.TransformElement
 import com.greenmist.vector.svg.element.ViewportElement
 
 class RenderState(
@@ -54,17 +52,22 @@ class RenderState(
     fun apply(element: SvgElement, canvas: Canvas) {
         style.updateStyle(element.style)
 
-        element.transform?.let {
-            matrix.preConcat(it.getMatrix())
-        }
+        when(element) {
+            is ViewportElement -> {
+                viewport = element.viewport
+                canvas.clipRect(viewport.toRectF(this))
 
-        if (element is ViewportElement) {
-            viewport = element.viewport
-            element.viewBox?.let {
-                viewBox = it
+                element.viewBox?.let {
+                    viewBox = it
+                }
+                viewBox?.let {
+                    matrix.preConcat(it.getMatrix(this, viewport, it, element.preserveAspectRatio))
+                }
             }
-            viewBox?.let {
-                matrix.preConcat(it.getMatrix(this, viewport, it, element.preserveAspectRatio))
+            is TransformElement -> {
+                element.transform?.let {
+                    matrix.preConcat(it.getMatrix())
+                }
             }
         }
 
@@ -88,11 +91,5 @@ class RenderState(
         style.strokeLineJoin?.let { strokePaint.strokeJoin = it }
 
         canvas.matrix = matrix
-        
-        if (element is ViewportElement) {
-            viewBox?.let {
-                canvas.clipRect(it.toRectF())
-            }
-        }
     }
 }

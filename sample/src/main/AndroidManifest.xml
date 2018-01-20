@@ -29,6 +29,8 @@
 
         <activity android:name=".screens.AdvancedActivity"/>
 
+        <activity android:name=".screens.BasicActivity" />
+
     </application>
 
 </manifest>

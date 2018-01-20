@@ -30,12 +30,14 @@ object Renderer {
                     element.render(canvas, renderState.strokePaint, renderState)
                 }
             }
+            canvas.save()
 
             element.children.forEach {
                 drawElement(it, canvas)
             }
         }
 
+        canvas.restore()
         renderState = stateStack.pop()
     }
 
