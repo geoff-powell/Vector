@@ -1,13 +1,12 @@
 package com.greenmist.vector.renderer
 
 import android.graphics.Canvas
-import android.graphics.Paint
-import android.view.View
-import com.greenmist.vector.lib.model.Length
-import com.greenmist.vector.lib.model.ViewBox
 import com.greenmist.vector.lib.svg.Svg
 import com.greenmist.vector.lib.svg.element.SvgElement
-import com.greenmist.vector.lib.svg.element.SvgRenderableElement
+import com.greenmist.vector.lib.svg.element.RenderableElement
+import com.greenmist.vector.svg.element.BoxElement
+import com.greenmist.vector.svg.element.PositionElement
+import com.greenmist.vector.svg.element.ReferenceElement
 import java.util.*
 
 object Renderer {
@@ -16,13 +15,13 @@ object Renderer {
 
     val stateStack = Stack<RenderState>()
 
-    fun drawElement(element: SvgElement, canvas: Canvas) {
+    fun drawElement(svg: Svg, element: SvgElement, canvas: Canvas) {
         stateStack.push(renderState)
         renderState = RenderState(renderState)
         renderState.apply(element, canvas)
 
         if (renderState.shouldDisplay()) {
-            if (element is SvgRenderableElement) {
+            if (element is RenderableElement) {
                 if (renderState.hasFill()) {
                     element.render(canvas, renderState.fillPaint, renderState)
                 }
@@ -32,8 +31,24 @@ object Renderer {
             }
             canvas.save()
 
-            element.children.forEach {
-                drawElement(it, canvas)
+            if (element is ReferenceElement) {
+                element.link?.let {
+                    svg.getByxLink(it)?.let {
+                        if (it is BoxElement && element is BoxElement) {
+                            it.x = element.x ?: it.x
+                            it.y = element.y ?: it.y
+                            it.width = element.width ?: it.width
+                            it.height = element.height ?: it.height
+                        }
+                        drawElement(svg, it, canvas)
+                    }
+                }
+            }
+
+            if (element.renderChildren) {
+                element.children.forEach {
+                    drawElement(svg, it, canvas)
+                }
             }
         }
 
@@ -46,7 +61,7 @@ object Renderer {
 
         stateStack.push(RenderState(renderState))
 
-        drawElement(svg.rootElement, canvas)
+        drawElement(svg, svg.rootElement, canvas)
 
         stateStack.pop()
     }

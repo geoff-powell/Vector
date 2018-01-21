@@ -8,7 +8,7 @@ import org.xml.sax.Attributes
 /**
  * Created by geoff.powell on 11/27/17.
  */
-class SvgLineElement(attributes: Attributes?) : SvgRenderableElement(attributes) {
+class LineElement(attributes: Attributes?) : SvgElement(attributes), RenderableElement {
 
     val x1 = properties["x1"]?.toFloatOrNull() ?: 0f
     val y1 = properties["y1"]?.toFloatOrNull() ?: 0f

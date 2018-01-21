@@ -8,7 +8,7 @@ import org.xml.sax.Attributes
 /**
  * Created by geoff.powell on 11/27/17.
  */
-class SvgCircleElement(attributes: Attributes?) : SvgRenderableElement(attributes) {
+class CircleElement(attributes: Attributes?) : SvgElement(attributes), RenderableElement {
 
     val x = properties["cx"]?.toFloatOrNull()
     val y = properties["cy"]?.toFloatOrNull()

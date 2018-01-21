@@ -8,7 +8,7 @@ import org.xml.sax.Attributes
 /**
  * Created by geoff.powell on 11/27/17.
  */
-abstract class SvgRenderableElement(attributes: Attributes?) : SvgElement(attributes) {
+interface RenderableElement {
 
-    abstract fun render(canvas: Canvas, paint: Paint, renderState: RenderState)
+    fun render(canvas: Canvas, paint: Paint, renderState: RenderState)
 }

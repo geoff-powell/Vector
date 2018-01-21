@@ -10,7 +10,7 @@ import org.xml.sax.Attributes
 /**
  * Created by geoff.powell on 11/27/17.
  */
-class SvgPathElement(attributes: Attributes?) : SvgRenderableElement(attributes) {
+class PathElement(attributes: Attributes?) : SvgElement(attributes), RenderableElement {
     val path: VPath? = properties["d"]?.toVPath()
 
     override fun render(canvas: Canvas, paint: Paint, renderState: RenderState) {

@@ -12,12 +12,18 @@ class Properties(attributes: Attributes?) {
     init {
         attributes?.let {
             for (i in 0 until attributes.length) {
-                propMap.put(attributes.getLocalName(i), attributes.getValue(i))
+                attributes.getQName(i)?.let {
+                    propMap.put(attributes.getQName(i), attributes.getValue(i))
+                } ?: propMap.put(attributes.getLocalName(i), attributes.getValue(i))
             }
         }
     }
 
     operator fun get(key: String) = propMap[key]
+
+    operator fun get(qualifiedName: String, key: String): String? {
+        return propMap["$qualifiedName:$key"]
+    }
 
     fun set(key: String, value: String) {
         propMap.put(key, value)

@@ -20,6 +20,8 @@ open class SvgElement(attributes: Attributes? = null) {
 
     var style: Style = Style(properties)
 
+    open val renderChildren = true
+
     open fun parseContent(content: String) {
 
     }

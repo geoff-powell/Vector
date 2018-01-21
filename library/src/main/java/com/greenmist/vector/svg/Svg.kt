@@ -20,6 +20,14 @@ class Svg internal constructor(
     val height: Float
         get() = rootElement.height?.getPxValueY(dpi.toFloat()) ?: 0f
 
+    fun getByxLink(id: String): SvgElement? {
+        return if (id.contains("#")) {
+            elementIdMap[id.replace("#", "")]
+        } else {
+            null
+        }
+    }
+
     fun getBitmap() : Bitmap {
         val bitmap = Bitmap.createBitmap(width.toInt(), height.toInt(), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)

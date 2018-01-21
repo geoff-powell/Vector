@@ -1,6 +1,7 @@
 package com.greenmist.vector.renderer
 
 import android.graphics.*
+import android.view.View
 import com.greenmist.vector.lib.model.Unit
 import com.greenmist.vector.lib.model.ViewBox
 import com.greenmist.vector.lib.model.Viewport
@@ -9,8 +10,7 @@ import com.greenmist.vector.lib.svg.element.SvgElement
 import com.greenmist.vector.svg.css.CssDisplay
 import com.greenmist.vector.svg.css.CssPaint
 import com.greenmist.vector.svg.css.CssVisibility
-import com.greenmist.vector.svg.element.TransformElement
-import com.greenmist.vector.svg.element.ViewportElement
+import com.greenmist.vector.svg.element.*
 
 class RenderState(
         val style: Style = Style.BASE,
@@ -52,22 +52,26 @@ class RenderState(
     fun apply(element: SvgElement, canvas: Canvas) {
         style.updateStyle(element.style)
 
-        when(element) {
-            is ViewportElement -> {
-                viewport = element.viewport
-                canvas.clipRect(viewport.toRectF(this))
 
-                element.viewBox?.let {
-                    viewBox = it
-                }
-                viewBox?.let {
+        if (element is ViewportElement) {
+            viewport = element.viewport
+            canvas.clipRect(viewport.toRectF(this))
+        }
+
+        if (element is ViewBoxElement) {
+            element.viewBox?.let {
+                viewBox = it
+            }
+            viewBox?.let {
+                if (element is ViewportElement) {
                     matrix.preConcat(it.getMatrix(this, viewport, it, element.preserveAspectRatio))
                 }
             }
-            is TransformElement -> {
-                element.transform?.let {
-                    matrix.preConcat(it.getMatrix())
-                }
+        }
+
+        if (element is TransformElement) {
+            element.transform?.let {
+                matrix.preConcat(it.getMatrix())
             }
         }
 

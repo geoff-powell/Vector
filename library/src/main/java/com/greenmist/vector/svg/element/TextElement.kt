@@ -1,7 +1,6 @@
 package com.greenmist.vector.lib.svg.element
 
 import android.graphics.*
-import com.greenmist.vector.lib.model.Length
 import com.greenmist.vector.lib.model.toLength
 import com.greenmist.vector.renderer.RenderState
 import org.xml.sax.Attributes
@@ -9,9 +8,9 @@ import org.xml.sax.Attributes
 /**
  * Created by geoff.powell on 11/27/17.
  */
-class SvgTextElement(
+class TextElement(
         attributes: Attributes?
-) : SvgRenderableElement(attributes) {
+) : SvgElement(attributes), RenderableElement {
 
     //TODO x, y list of coordinates
     val x = properties["x"]?.toLength()
